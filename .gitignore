@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.log
+
+# Local environment
+.env
+server/.env
+
+# Runtime data (SQLite DB + uploaded avatars)
+server/data/*.db
+server/data/*.db-*
+server/uploads/*
+!server/uploads/.gitkeep

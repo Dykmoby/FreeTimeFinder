@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(command -v curl wget git)",
+      "Bash(curl -sS -m 10 -o /dev/null -w \"github: %{http_code}\\\\n\" https://raw.githubusercontent.com)",
+      "Bash(curl -sS -m 10 -o /dev/null -w \"npm: %{http_code}\\\\n\" https://registry.npmjs.org)",
+      "Bash(export PROFILE=/dev/null)",
+      "Bash(curl -sS -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh)",
+      "Bash(bash)",
+      "Bash(echo \"--- nvm install exit: $? ---\")",
+      "Read(//home/dykmoby/**)",
+      "Bash(curl -sS --retry 5 --retry-delay 1 --retry-connrefused http://localhost:4000/)",
+      "Bash(curl -sS http://localhost:4000/api/health)",
+      "Bash(curl -sS -o /dev/null -w \"%{http_code} %{content_type}\\\\n\" http://localhost:4000/admin)",
+      "Bash(curl -sS -o /dev/null -w \"css: %{http_code}\\\\n\" http://localhost:4000/assets/index-Cc6CSWfq.css)",
+      "Bash(curl -sS -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:4000/api/auth/login -H 'Content-Type: application/json' -d '{\"username\":\"admin\",\"password\":\"admin\"}')",
+      "Bash(bash /home/dykmoby/free-time-finder/scripts/deploy.sh)",
+      "Bash(grep -vE 'deprecated|funding|packages are looking|audited|found 0 vuln|up to date|^\\\\s*$|^> |run `npm')"
+    ]
+  }
+}
