@@ -1,0 +1,451 @@
+/* =========================================================================
+   Free Time Finder — global styles
+   Minimalist dark theme with gradient accents and subtle shimmer.
+   Grouped by: tokens, base, primitives (buttons/cards/forms), layout,
+   then feature blocks (grid, calendar, admin), then responsive tweaks.
+   ========================================================================= */
+
+:root {
+  --bg: #0b0b16;
+  --bg-soft: #12121f;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.10);
+  --text: #ecebff;
+  --muted: #9a98c0;
+  --accent: #7f5af0;
+  --accent-2: #2cb1bc;
+  --danger: #f25f6b;
+  --grad: linear-gradient(135deg, #7f5af0, #2cb1bc);
+  --grad-soft: linear-gradient(135deg, rgba(127, 90, 240, 0.18), rgba(44, 177, 188, 0.18));
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(127, 90, 240, 0.20), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(44, 177, 188, 0.16), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; }
+.muted { color: var(--muted); font-size: 0.9rem; }
+.hint { color: var(--muted); font-size: 0.85rem; margin: 6px 0 0; }
+
+/* Shimmering gradient text */
+.shine-text {
+  background: linear-gradient(100deg, #fff, #b8a6ff, #84e6e6, #fff);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 6s linear infinite;
+}
+@keyframes shine { to { background-position: 250% center; } }
+
+/* ----- Buttons ----------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s;
+}
+.btn:hover { background: var(--surface-2); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn--sm { padding: 6px 12px; font-size: 0.86rem; border-radius: 8px; }
+.btn--block { width: 100%; }
+.btn--ghost { background: transparent; }
+.btn--danger { border-color: rgba(242, 95, 107, 0.4); color: #ffd2d6; }
+.btn--danger:hover { background: rgba(242, 95, 107, 0.14); }
+
+.btn--primary {
+  position: relative;
+  border: none;
+  color: #0c0c18;
+  font-weight: 650;
+  background: var(--grad);
+  background-size: 180% 180%;
+  animation: drift 7s ease infinite;
+}
+.btn--primary:hover { filter: brightness(1.07); }
+@keyframes drift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ----- Cards & forms ----------------------------------------------------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+.card__title { font-weight: 600; margin-bottom: 12px; }
+.card--grid { padding: 14px; overflow-x: auto; }
+/* Card header row: title on the left, a control (e.g. a mode toggle) in the corner. */
+.card__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.card__head .card__title { margin-bottom: 0; }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field > span { font-size: 0.82rem; color: var(--muted); }
+input, select {
+  width: 100%;
+  padding: 11px 13px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.22);
+}
+input[type='time'] { width: auto; }
+
+/* 24-hour time entry (TimeField) — dropdown and keyboard modes */
+.time-field { display: inline-flex; align-items: center; gap: 4px; }
+.time-field__sel { width: auto; padding: 9px 10px; font-variant-numeric: tabular-nums; }
+.time-field__colon { color: var(--muted); }
+.time-field__text { width: 5.2em; text-align: center; padding: 9px 10px; font-variant-numeric: tabular-nums; letter-spacing: 0.06em; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0 16px;
+}
+
+.alert {
+  background: rgba(242, 95, 107, 0.12);
+  border: 1px solid rgba(242, 95, 107, 0.35);
+  color: #ffd2d6;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+/* ----- Layout shell ------------------------------------------------------ */
+.app-shell { min-height: 100%; display: flex; flex-direction: column; }
+.topbar { position: sticky; top: 0; z-index: 20; background: rgba(11, 11, 22, 0.72); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+.topbar__inner { max-width: 1080px; margin: 0 auto; padding: 12px 18px; display: flex; align-items: center; gap: 18px; }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 700; }
+.brand__dot { width: 16px; height: 16px; border-radius: 50%; background: var(--grad); box-shadow: 0 0 16px rgba(127, 90, 240, 0.7); }
+.brand__dot--lg { width: 26px; height: 26px; }
+.brand__name { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.nav { display: flex; gap: 4px; margin-right: auto; }
+.nav__link { padding: 8px 12px; border-radius: 9px; color: var(--muted); transition: color 0.2s, background 0.2s; }
+.nav__link:hover { color: var(--text); background: var(--surface); }
+.nav__link.active { color: var(--text); background: var(--grad-soft); }
+
+.topbar__user { display: flex; align-items: center; gap: 10px; }
+.topbar__profile { display: flex; align-items: center; gap: 8px; }
+.topbar__nick { font-size: 0.9rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.page { max-width: 1080px; width: 100%; margin: 0 auto; padding: 22px 18px 60px; }
+.page__title { font-size: 1.5rem; margin-bottom: 4px; }
+.page__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+/* Admin's per-user editor heading: avatar + "Время · Ник". */
+.cal-head__user { display: inline-flex; align-items: center; gap: 9px; font-weight: 600; }
+
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.stack--narrow { max-width: 560px; }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.row-gap { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ----- Auth screens ------------------------------------------------------ */
+.center-screen { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+.auth-bg { background:
+    radial-gradient(900px 500px at 20% 0%, rgba(127, 90, 240, 0.25), transparent 60%),
+    radial-gradient(800px 500px at 90% 100%, rgba(44, 177, 188, 0.22), transparent 55%); }
+.auth-card { width: 100%; max-width: 380px; }
+.auth-card__head { text-align: center; margin-bottom: 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.auth-card__head h1 { font-size: 1.5rem; }
+
+.spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ----- Segmented control & toolbar -------------------------------------- */
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3px; }
+.seg__btn { border: none; background: transparent; color: var(--muted); padding: 7px 14px; border-radius: 9px; transition: color 0.2s, background 0.2s; }
+.seg__btn.is-active { color: #0c0c18; background: var(--grad); font-weight: 600; }
+.seg--mini { border-radius: 9px; padding: 2px; }
+.seg--mini .seg__btn { padding: 5px 10px; font-size: 0.8rem; border-radius: 7px; }
+
+.toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.toolbar--compact { margin-bottom: 10px; }
+.toolbar__nav { display: flex; gap: 6px; }
+.toolbar__title { font-weight: 600; color: var(--text); }
+
+/* ----- Avatar ------------------------------------------------------------ */
+.avatar { border-radius: 50%; object-fit: cover; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--border); }
+.avatar--fallback { color: #fff; font-weight: 650; letter-spacing: 0.02em; }
+
+/* ----- Time grid (shared by editor & overview) -------------------------- */
+.grid {
+  --row-h: 22px;
+  --head-h: 46px;
+  display: grid;
+  grid-template-columns: 54px repeat(var(--cols), minmax(64px, 1fr));
+  grid-template-rows: var(--head-h) repeat(var(--rows, 48), var(--row-h));
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none; /* no iOS text bubble on press-and-hold */
+  -webkit-tap-highlight-color: transparent; /* no grey flash when tapping a cell */
+  min-width: max-content;
+}
+.grid.is-painting, .grid.is-resizing { touch-action: none; } /* paint / edge-drag: don't scroll */
+.grid__corner { position: sticky; left: 0; }
+.grid__dayhead {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 4px; border: none; background: transparent; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.grid__dayhead.is-today { color: var(--text); }
+.grid__dayhead.is-today .grid__date { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 700; }
+.grid__dow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.grid__date { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+.grid__time { height: var(--row-h); font-size: 0.68rem; color: var(--muted); text-align: right; padding-right: 8px; transform: translateY(-7px); }
+.grid__time--hour { color: var(--text); }
+
+.slot {
+  height: var(--row-h);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px dashed rgba(255, 255, 255, 0.06); /* faint :30 tick */
+  transition: background 0.12s;
+  touch-action: manipulation; /* tap toggles, swipe scrolls */
+  -webkit-tap-highlight-color: transparent; /* no grey flash on tap */
+}
+/* Strong line at the START of each hour, aligned with the hour label. */
+.slot--hour { border-top: 1px solid rgba(255, 255, 255, 0.22); }
+/* Hover preview only on a real mouse. Key off `pointer: fine`, not just
+   `hover: hover` — many phones report `hover: hover` and would otherwise keep a
+   sticky tap-highlight that looks like a half-made selection. */
+@media (hover: hover) and (pointer: fine) {
+  .grid:not(.is-resizing) .slot:not(.slot--ro):hover { background: rgba(127, 90, 240, 0.25); cursor: pointer; }
+}
+/* While dragging an edge, don't tint the cell under the cursor — only the
+   interval's own fill should move. */
+.grid.is-resizing .slot { cursor: ns-resize; }
+.slot--on { background: var(--grad); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15); }
+/* Round only the ends of a run so the interval reads as one band. */
+.slot--on-top { border-top-left-radius: 8px; border-top-right-radius: 8px; }
+.slot--on-bottom { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+.slot--common {
+  background: linear-gradient(135deg, #ffd803, #ff8906);
+  background-size: 200% 200%;
+  animation: drift 4s ease infinite;
+}
+.slot--ro { cursor: default; }
+
+/* ----- Interval blocks (per-interval visibility, editor only) ------------ */
+/* A framed band over the slots a saved interval covers. The body is
+   click-through so painting/removing still works on the cells underneath;
+   only the visibility badge & popover are interactive. */
+/* Gold edge: stands out against the purple→teal slot fill (teal blended in). */
+.iv-block {
+  --iv-edge: #ffcf52;
+  position: relative;
+  pointer-events: none;
+  margin: 1px;
+  border-radius: 7px;
+  box-shadow: inset 0 0 0 1.5px transparent;
+  transition: box-shadow 0.12s;
+  z-index: 2;
+}
+.iv-block.is-restricted { box-shadow: inset 0 0 0 2px var(--iv-edge); }
+/* Selection frame when the panel is open (touch: long-press; desktop: badge). */
+.iv-block.is-open { box-shadow: inset 0 0 0 1.5px rgba(236, 235, 255, 0.7); }
+.iv-block.is-restricted.is-open { box-shadow: inset 0 0 0 2px var(--iv-edge), 0 0 0 2px rgba(255, 207, 82, 0.45); }
+/* Hover frame only on a real mouse — touch must not leave a lingering outline
+   after a tap that reads like an unsaved selection. */
+@media (hover: hover) and (pointer: fine) {
+  .iv-block.is-hover { box-shadow: inset 0 0 0 1.5px rgba(236, 235, 255, 0.7); }
+  .iv-block.is-restricted.is-hover { box-shadow: inset 0 0 0 2px var(--iv-edge), 0 0 0 2px rgba(255, 207, 82, 0.45); }
+}
+
+/* Resize handles (mouse only) — grabbable strips at the block's edges. */
+.iv-resize {
+  pointer-events: none;
+  position: absolute;
+  left: 0; right: 0;
+  height: 8px;
+  cursor: ns-resize;
+  opacity: 0;
+}
+.iv-resize--top { top: -1px; }
+.iv-resize--bottom { bottom: -1px; }
+.iv-block.is-hover .iv-resize,
+.iv-block.is-open .iv-resize { pointer-events: auto; opacity: 1; }
+.iv-block.is-hover .iv-resize::after,
+.iv-block.is-open .iv-resize::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 22px; height: 3px; transform: translate(-50%, -50%);
+  border-radius: 999px; background: rgba(236, 235, 255, 0.8);
+}
+/* On any touchscreen (coarse pointer): the handles appear once a long-press
+   selects the interval (which also opens the visibility panel). Taller for the
+   thumb. `pointer: coarse` catches phones that wrongly report `hover: hover`. */
+@media (hover: none), (pointer: coarse) {
+  .iv-resize { display: none; }
+  .iv-block.is-open .iv-resize { display: block; height: 18px; }
+  .iv-block.is-open .iv-resize--top { top: -6px; }
+  .iv-block.is-open .iv-resize--bottom { bottom: -6px; }
+  .iv-block.is-open .iv-resize::after { width: 34px; height: 4px; }
+}
+
+.iv-badge {
+  pointer-events: auto;
+  position: absolute; top: 2px; right: 2px;
+  display: inline-flex; align-items: center; gap: 2px;
+  min-height: 20px; padding: 1px 4px;
+  border-radius: 999px; border: 1px solid var(--border);
+  background: rgba(11, 11, 22, 0.72); color: var(--muted);
+  font-size: 0.62rem; cursor: pointer;
+  opacity: 0; transition: opacity 0.12s;
+}
+.iv-block.is-restricted .iv-badge,
+.iv-block.is-hover .iv-badge,
+.iv-block.is-open .iv-badge { opacity: 1; }
+/* Any touchscreen has no badge button — the panel opens by long-pressing the
+   interval. `pointer: coarse` catches phones that wrongly report `hover: hover`. */
+@media (hover: none), (pointer: coarse) { .iv-badge { display: none; } }
+.iv-badge:hover { border-color: var(--accent); color: var(--text); }
+.iv-badge__avatars { display: inline-flex; align-items: center; }
+.iv-badge__avatars .avatar { margin-left: -7px; box-shadow: 0 0 0 1.5px #0b0b16; }
+.iv-badge__avatars .avatar:first-child { margin-left: 0; }
+.iv-badge__more { padding: 0 2px; }
+.iv-badge__all { padding: 0 2px; letter-spacing: 0.02em; }
+
+/* Fixed-positioned (placed by JS) so it's always fully on-screen. */
+.iv-pop {
+  pointer-events: auto;
+  position: fixed; top: 0; left: 0;
+  width: 210px; max-width: 92vw;
+  padding: 11px; border-radius: 12px;
+  background: var(--bg-soft); border: 1px solid var(--border);
+  box-shadow: var(--shadow); z-index: 60;
+}
+.iv-pop__title { font-size: 0.74rem; color: var(--muted); margin-bottom: 9px; }
+.iv-pop__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.iv-pop__hint { font-size: 0.7rem; color: var(--muted); margin: 9px 0 0; line-height: 1.35; }
+.chip--sm { padding: 3px 9px 3px 3px; font-size: 0.78rem; }
+
+/* ----- Month view -------------------------------------------------------- */
+.month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.month__head { text-align: center; font-size: 0.74rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; padding-bottom: 4px; }
+.month__cell {
+  position: relative; min-height: 64px; border: 1px solid var(--border); background: var(--surface);
+  border-radius: var(--radius-sm); padding: 8px; text-align: left; color: var(--text);
+  display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s, transform 0.08s;
+}
+.month__cell:hover { border-color: var(--accent); }
+.month__cell.is-dim { opacity: 0.4; }
+.month__cell.is-today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.month__num { font-weight: 600; }
+.month__badge { align-self: flex-start; font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; background: var(--grad-soft); border: 1px solid var(--border); color: var(--text); }
+
+/* ----- Day view ---------------------------------------------------------- */
+.day-layout { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+.time-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+/* The overlap warning sits right under the time inputs — give it some air. */
+.time-row + .alert { margin-top: 12px; margin-bottom: 0; }
+.interval-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.interval-list li { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.interval-list__time { font-variant-numeric: tabular-nums; }
+.interval-list__actions { display: inline-flex; gap: 2px; }
+.interval-list li.interval-list__editing { flex-direction: column; align-items: stretch; gap: 10px; }
+.interval-edit { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.icon-btn { background: transparent; border: none; color: var(--muted); font-size: 0.95rem; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
+.icon-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.08); }
+.icon-btn--danger:hover { color: var(--danger); background: rgba(242, 95, 107, 0.12); }
+
+/* ----- People chips / common list (Everyone page) ----------------------- */
+.people__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px 5px 5px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 0.86rem; }
+.chip--on { border-color: var(--accent); background: var(--grad-soft); }
+.chip--me { border-color: var(--accent-2); }
+
+.common-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.common-list li { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.common-list__day { min-width: 130px; font-weight: 600; }
+.common-list__times { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill { padding: 4px 10px; border-radius: 999px; font-size: 0.82rem; font-variant-numeric: tabular-nums; background: linear-gradient(135deg, rgba(255, 216, 3, 0.2), rgba(255, 137, 6, 0.2)); border: 1px solid rgba(255, 216, 3, 0.4); }
+
+/* ----- Profile ----------------------------------------------------------- */
+.profile-head { display: flex; align-items: center; gap: 18px; }
+.profile-head__nick { font-size: 1.25rem; font-weight: 650; }
+.profile-head__actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.swatch {
+  width: 40px; height: 40px; border-radius: 50%; padding: 0;
+  border: 2px solid transparent; cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.swatch.is-active { border-color: var(--text); box-shadow: 0 0 0 3px rgba(127, 90, 240, 0.35); }
+.swatch--auto {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--surface-2); color: var(--muted); font-size: 0.72rem; width: auto; padding: 0 14px;
+  border: 2px solid var(--border); border-radius: 999px;
+}
+.swatch--auto.is-active { color: var(--text); border-color: var(--text); }
+
+/* ----- Admin ------------------------------------------------------------- */
+.user-table { display: flex; flex-direction: column; gap: 10px; }
+.user-row-wrap { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.user-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--surface); flex-wrap: wrap; }
+.user-row__main { display: flex; align-items: center; gap: 12px; }
+.user-row__nick { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.user-row__actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.badge { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; background: var(--grad); color: #0c0c18; font-weight: 700; }
+.badge--muted { background: var(--surface-2); color: var(--muted); }
+.edit-panel { padding: 14px; border-top: 1px solid var(--border); background: rgba(0, 0, 0, 0.18); }
+
+/* ----- Toasts ------------------------------------------------------------ */
+.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); padding: 11px 18px; border-radius: 999px; box-shadow: var(--shadow); z-index: 50; font-size: 0.9rem; }
+.toast--inline { position: static; transform: none; display: inline-block; }
+.toast--ok { background: linear-gradient(135deg, rgba(44, 177, 188, 0.9), rgba(127, 90, 240, 0.9)); color: #fff; }
+.toast--err { background: var(--danger); color: #fff; }
+
+/* ----- Responsive -------------------------------------------------------- */
+@media (max-width: 720px) {
+  .day-layout { grid-template-columns: 1fr; }
+  .page { padding: 16px 12px 60px; }
+  .month__cell { min-height: 52px; padding: 6px; }
+  .month__badge { font-size: 0.62rem; padding: 1px 6px; }
+
+  /* Header: brand + account on the top row, nav as a full-width tab row below. */
+  .topbar__nick { display: none; }
+  .topbar__inner { flex-wrap: wrap; gap: 8px 10px; padding: 10px 12px; }
+  .topbar__user { order: 2; margin-left: auto; }
+  .nav { order: 3; flex-basis: 100%; margin-right: 0; gap: 6px; }
+  .nav__link { flex: 1; text-align: center; padding: 9px 6px; font-size: 0.9rem; }
+
+  /* Roomier rows for thumb taps; fit the week without sideways scrolling. */
+  .grid { grid-template-columns: 46px repeat(var(--cols), minmax(40px, 1fr)); --row-h: 30px; }
+}
