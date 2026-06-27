@@ -4,8 +4,8 @@ import { Users } from '../models/user.model.js';
 import { Availability } from '../models/availability.model.js';
 import { config } from '../config.js';
 import { hashPassword } from '../utils/password.js';
-import { ApiError, asyncHandler, parseDay, parseMinute } from '../utils/http.js';
-import { readInterval, readVisibleTo } from './availability.controller.js';
+import { ApiError, asyncHandler, parseDay } from '../utils/http.js';
+import { readInterval, readDayIntervals } from './availability.controller.js';
 
 function validateUsername(username) {
   if (!username || typeof username !== 'string') throw new ApiError(400, 'Username is required');
@@ -124,18 +124,9 @@ export const replaceUserDay = asyncHandler(async (req, res) => {
   const userId = Number(req.params.id);
   if (!Users.findById(userId)) throw new ApiError(404, 'User not found');
   const day = parseDay(req.body?.day);
-  const incoming = Array.isArray(req.body?.intervals) ? req.body.intervals : [];
-  // Mirror replaceMyDay: the client sends an already-reconciled, non-overlapping
-  // set where each interval keeps its own audience, so we don't merge here
-  // (merging would fuse blocks with different visibility). Validate + drop empties.
-  const cleaned = incoming
-    .map((iv) => ({
-      startMin: parseMinute(iv.startMin, 'startMin'),
-      endMin: parseMinute(iv.endMin, 'endMin'),
-      visibleTo: readVisibleTo(iv.visibleTo),
-    }))
-    .filter((iv) => iv.endMin > iv.startMin)
-    .sort((a, b) => a.startMin - b.startMin);
+  // Mirror replaceMyDay: validate the already-reconciled, audience-carrying set
+  // without merging (merging would fuse blocks with different visibility).
+  const cleaned = readDayIntervals(req.body);
   res.json({ availability: Availability.replaceDay(userId, day, cleaned) });
 });
 

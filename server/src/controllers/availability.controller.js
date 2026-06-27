@@ -21,6 +21,24 @@ export function readInterval(body) {
   return { day, startMin, endMin, note, visibleTo };
 }
 
+/**
+ * Validate the intervals for a whole-day replace (used by the slot-grid editor).
+ * The client sends an already-reconciled, non-overlapping set where each interval
+ * carries its own audience, so we keep them distinct — merging here would fuse
+ * blocks with different visibility. We only validate + drop empties.
+ */
+export function readDayIntervals(body) {
+  const incoming = Array.isArray(body?.intervals) ? body.intervals : [];
+  return incoming
+    .map((iv) => ({
+      startMin: parseMinute(iv.startMin, 'startMin'),
+      endMin: parseMinute(iv.endMin, 'endMin'),
+      visibleTo: readVisibleTo(iv.visibleTo),
+    }))
+    .filter((iv) => iv.endMin > iv.startMin)
+    .sort((a, b) => a.startMin - b.startMin);
+}
+
 // --- Current user's own availability --------------------------------------
 
 export const listMine = asyncHandler(async (req, res) => {
@@ -50,18 +68,7 @@ export const deleteMine = asyncHandler(async (req, res) => {
 /** Replace every interval the user has on one day (used by the slot-grid editor). */
 export const replaceMyDay = asyncHandler(async (req, res) => {
   const day = parseDay(req.body?.day);
-  const incoming = Array.isArray(req.body?.intervals) ? req.body.intervals : [];
-  // The client sends an already-reconciled, non-overlapping set where each
-  // interval carries its own audience, so we keep them distinct (merging here
-  // would fuse blocks with different visibility). We only validate + drop empties.
-  const cleaned = incoming
-    .map((iv) => ({
-      startMin: parseMinute(iv.startMin, 'startMin'),
-      endMin: parseMinute(iv.endMin, 'endMin'),
-      visibleTo: readVisibleTo(iv.visibleTo),
-    }))
-    .filter((iv) => iv.endMin > iv.startMin)
-    .sort((a, b) => a.startMin - b.startMin);
+  const cleaned = readDayIntervals(req.body);
   res.json({ availability: Availability.replaceDay(req.user.id, day, cleaned) });
 });
 
