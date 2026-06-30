@@ -22,6 +22,15 @@ export function parseMinute(value, field) {
   return n;
 }
 
+/** Validate / parse an epoch-milliseconds UTC instant. */
+export function parseEpochMs(value, field) {
+  const n = Number(value);
+  if (!Number.isInteger(n) || !Number.isFinite(n)) {
+    throw new ApiError(400, `Invalid value for "${field}"`);
+  }
+  return n;
+}
+
 /** Validate a 'YYYY-MM-DD' day string. */
 export function parseDay(value, field = 'day') {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {

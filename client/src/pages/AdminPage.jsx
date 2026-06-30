@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import Avatar from '../components/Avatar.jsx';
 import CalendarEditor from '../components/CalendarEditor.jsx';
+import { makeEditorPlumbing } from '../lib/availabilityClient.js';
+import { getLocalTimeZone } from '../lib/tz.js';
 
 export default function AdminPage() {
   const { user: me } = useAuth();
@@ -226,19 +228,18 @@ function EditUserForm({ user, onSave, onCancel }) {
 function AvailabilityEditor({ user, users, onError }) {
   const people = useMemo(() => users.filter((u) => u.id !== user.id), [users, user.id]);
 
-  const fetchRange = useCallback(
-    (from, to) =>
-      api(`/admin/users/${user.id}/availability?from=${from}&to=${to}`).then((r) => r.availability),
-    [user.id],
-  );
-  const replaceDay = useCallback(
-    (iso, intervals) =>
-      api(`/admin/users/${user.id}/availability/day`, { method: 'PUT', body: { day: iso, intervals } }),
-    [user.id],
-  );
-  const removeInterval = useCallback(
-    (id) => api(`/admin/availability/${id}`, { method: 'DELETE' }),
-    [],
+  // Edit the user's calendar in *their* timezone, so what the admin paints lands
+  // on the user's own clock. Falls back to the admin's zone if the user has none
+  // recorded yet (they haven't logged in since timezone support landed).
+  const tz = user.timezone || getLocalTimeZone();
+  const { fetchRange, replaceDay, removeInterval } = useMemo(
+    () => makeEditorPlumbing({
+      tz,
+      listPath: `/admin/users/${user.id}/availability`,
+      dayPath: `/admin/users/${user.id}/availability/day`,
+      delPath: (id) => `/admin/availability/${id}`,
+    }),
+    [user.id, tz],
   );
 
   return (

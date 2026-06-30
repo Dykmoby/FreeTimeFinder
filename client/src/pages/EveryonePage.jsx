@@ -13,12 +13,14 @@ import {
   weekDays,
 } from '../lib/time.js';
 import { intersectMany } from '../lib/intervals.js';
+import { getLocalTimeZone, localRangeToUtc, serverIntervalsToLocal } from '../lib/tz.js';
 
 const freeAt = (intervals, slot) =>
   intervals.some((iv) => iv.startMin <= slot && iv.endMin >= slot + SLOT_MIN);
 
 export default function EveryonePage() {
   const { user } = useAuth();
+  const tz = useMemo(() => getLocalTimeZone(), []);
   const [cursor, setCursor] = useState(() => new Date());
   const [users, setUsers] = useState([]);
   const [availability, setAvailability] = useState([]);
@@ -37,13 +39,16 @@ export default function EveryonePage() {
   const to = toISODate(days[6]);
 
   useEffect(() => {
-    api(`/availability/everyone?from=${from}&to=${to}`)
+    const { fromUtc, toUtc } = localRangeToUtc(from, to, tz);
+    api(`/availability/everyone?fromUtc=${fromUtc}&toUtc=${toUtc}`)
       .then(({ users, availability }) => {
         setUsers(users);
-        setAvailability(availability);
+        // Server returns UTC instants; render them in the viewer's own zone,
+        // splitting any block that crosses local midnight into per-day pieces.
+        setAvailability(serverIntervalsToLocal(availability, tz));
       })
       .catch((e) => setError(e.message));
-  }, [from, to]);
+  }, [from, to, tz]);
 
   const others = useMemo(() => users.filter((u) => u.id !== user.id), [users, user.id]);
   // Show yourself first in "Кто отмечен", then everyone else.

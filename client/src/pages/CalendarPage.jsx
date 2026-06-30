@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import CalendarEditor from '../components/CalendarEditor.jsx';
+import { makeEditorPlumbing } from '../lib/availabilityClient.js';
+import { getLocalTimeZone } from '../lib/tz.js';
 
 export default function CalendarPage() {
   const { user } = useAuth();
@@ -14,16 +16,14 @@ export default function CalendarPage() {
       .catch(() => setPeople([]));
   }, [user.id]);
 
-  const fetchRange = useCallback(
-    (from, to) => api(`/availability/mine?from=${from}&to=${to}`).then((r) => r.availability),
-    [],
-  );
-  const replaceDay = useCallback(
-    (iso, intervals) => api('/availability/mine/day', { method: 'PUT', body: { day: iso, intervals } }),
-    [],
-  );
-  const removeInterval = useCallback(
-    (id) => api(`/availability/mine/${id}`, { method: 'DELETE' }),
+  // My own calendar is edited in my own (auto-detected) timezone.
+  const { fetchRange, replaceDay, removeInterval } = useMemo(
+    () => makeEditorPlumbing({
+      tz: getLocalTimeZone(),
+      listPath: '/availability/mine',
+      dayPath: '/availability/mine/day',
+      delPath: (id) => `/availability/mine/${id}`,
+    }),
     [],
   );
 

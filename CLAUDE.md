@@ -42,13 +42,31 @@ same-origin `/api/...`, so the same code works in both modes.
 
 ### Data model (the core abstraction)
 Everything revolves around **availability intervals**, one row per free-time block
-(`server/src/db/schema.sql`). Time is stored as **minutes-from-midnight** (`start_min`,
-`end_min`, 0–1440) for a given `day` (`'YYYY-MM-DD'`, in the browser's local timezone). Both
-the half-hour slot grid and the "precise interval" UI produce the same interval rows.
+(`server/src/db/schema.sql`). Time is stored **canonically in UTC** as absolute instants
+(`start_utc`, `end_utc`, epoch milliseconds) so each viewer can see it in their own zone.
+The columns `day` (`'YYYY-MM-DD'`), `start_min`/`end_min` (0–1440) are a **denormalised
+owner-local editing cache** — they let the owner (and admins) paint on a per-day 00:00–24:00
+grid with no conversion, while the server recomputes the UTC instants from them on write.
+Both the half-hour slot grid and the "precise interval" UI produce the same interval rows.
 
 Each interval has **`visible_to`**: `NULL`/empty = everyone, else a JSON array of user ids
 allowed to see it on shared pages (the owner always sees their own). This per-interval
 audience is load-bearing across the stack — see the audience rules below.
+
+### Timezones (don't break this)
+Each user has an IANA `timezone` (e.g. `Europe/Moscow`), **auto-detected** by the browser
+(`Intl…timeZone`) and synced to the server by `AuthContext` on login — zero configuration.
+All timezone math lives on the client in **`client/src/lib/tz.js`** (no library; built on
+`Intl`); the server stays timezone-agnostic and only stores/serves UTC instants and filters
+by a UTC window (`fromUtc`/`toUtc` query params). The editor plumbing in
+**`client/src/lib/availabilityClient.js`** converts owner-local edits → UTC on save, using
+the owner's zone for one's own calendar and the **target user's** zone when an admin edits
+someone else. The own-calendar/admin **read** path uses the stored owner-local `day`/`min`
+directly (no conversion). The shared **"Все"** page is the only place that converts
+UTC → the *viewer's* zone (`serverIntervalsToLocal`), splitting any block that crosses local
+midnight into per-day pieces; overlap (`intersectMany`) then runs in the viewer's frame.
+Known accepted edge: if an owner changes timezones, their already-saved marks shift (frozen
+UTC instant) and editing a day can disturb a fragment that now spills past local midnight.
 
 ### Interval logic lives on the client
 The math for merging, subtracting, intersecting, and overlap-testing intervals is in

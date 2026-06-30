@@ -2,7 +2,7 @@ import { db } from '../db/index.js';
 
 // Columns that are safe to expose to clients (never the password hash).
 const PUBLIC_FIELDS =
-  'id, username, nickname, role, avatar, avatar_color, must_change_password, created_at';
+  'id, username, nickname, role, avatar, avatar_color, timezone, must_change_password, created_at';
 
 /** Convert a DB row into the shape the API returns (camelCase, no secrets). */
 function toPublic(row) {
@@ -14,6 +14,7 @@ function toPublic(row) {
     role: row.role,
     avatar: row.avatar,
     avatarColor: row.avatar_color,
+    timezone: row.timezone || null,
     mustChangePassword: Boolean(row.must_change_password),
     createdAt: row.created_at,
   };
@@ -57,7 +58,7 @@ export const Users = {
   },
 
   /** Patch any subset of editable fields. Values left undefined are untouched. */
-  update(id, { nickname, role, avatar, username, avatarColor } = {}) {
+  update(id, { nickname, role, avatar, username, avatarColor, timezone } = {}) {
     const current = this.findRawById(id);
     if (!current) return null;
     db.prepare(
@@ -66,7 +67,8 @@ export const Users = {
          nickname     = ?,
          role         = ?,
          avatar       = ?,
-         avatar_color = ?
+         avatar_color = ?,
+         timezone     = ?
        WHERE id = ?`
     ).run(
       username ?? current.username,
@@ -74,6 +76,7 @@ export const Users = {
       role ?? current.role,
       avatar === undefined ? current.avatar : avatar,
       avatarColor === undefined ? current.avatar_color : avatarColor,
+      timezone === undefined ? current.timezone : timezone,
       id
     );
     return this.findById(id);

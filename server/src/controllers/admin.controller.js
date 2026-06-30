@@ -5,7 +5,7 @@ import { Availability } from '../models/availability.model.js';
 import { config } from '../config.js';
 import { hashPassword } from '../utils/password.js';
 import { ApiError, asyncHandler, parseDay } from '../utils/http.js';
-import { readInterval, readDayIntervals } from './availability.controller.js';
+import { readInterval, readDayIntervals, readDayWindow, readUtcRange } from './availability.controller.js';
 
 function validateUsername(username) {
   if (!username || typeof username !== 'string') throw new ApiError(400, 'Username is required');
@@ -108,8 +108,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
 export const listUserAvailability = asyncHandler(async (req, res) => {
   const userId = Number(req.params.id);
   if (!Users.findById(userId)) throw new ApiError(404, 'User not found');
-  const { from, to } = req.query;
-  res.json({ availability: Availability.listByUser(userId, { from, to }) });
+  res.json({ availability: Availability.listByUser(userId, readUtcRange(req.query)) });
 });
 
 export const createUserInterval = asyncHandler(async (req, res) => {
@@ -127,7 +126,7 @@ export const replaceUserDay = asyncHandler(async (req, res) => {
   // Mirror replaceMyDay: validate the already-reconciled, audience-carrying set
   // without merging (merging would fuse blocks with different visibility).
   const cleaned = readDayIntervals(req.body);
-  res.json({ availability: Availability.replaceDay(userId, day, cleaned) });
+  res.json({ availability: Availability.replaceDay(userId, day, cleaned, readDayWindow(req.body)) });
 });
 
 export const updateInterval = asyncHandler(async (req, res) => {

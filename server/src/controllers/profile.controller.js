@@ -8,9 +8,20 @@ import { ApiError, asyncHandler } from '../utils/http.js';
 // client's lib/avatarGradients.js). null clears the choice (back to auto).
 const AVATAR_COLOR_IDS = ['violet', 'rose', 'sunset', 'gold', 'mint', 'sky', 'ember', 'ocean'];
 
-/** Update the current user's own nickname and/or fallback-avatar gradient. */
+/** Reject anything that isn't a real IANA zone the runtime understands. */
+function validateTimezone(tz) {
+  if (typeof tz !== 'string' || !tz) throw new ApiError(400, 'Invalid timezone');
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: tz });
+  } catch {
+    throw new ApiError(400, 'Invalid timezone');
+  }
+  return tz;
+}
+
+/** Update the current user's own nickname, fallback-avatar gradient, and/or timezone. */
 export const updateMyProfile = asyncHandler(async (req, res) => {
-  const { nickname, avatarColor } = req.body || {};
+  const { nickname, avatarColor, timezone } = req.body || {};
   if (nickname !== undefined && (!nickname.trim() || nickname.length > 40)) {
     throw new ApiError(400, 'Nickname must be 1–40 characters');
   }
@@ -20,6 +31,7 @@ export const updateMyProfile = asyncHandler(async (req, res) => {
   const user = Users.update(req.user.id, {
     nickname: nickname?.trim(),
     avatarColor, // undefined leaves it untouched; null clears it
+    timezone: timezone === undefined ? undefined : validateTimezone(timezone),
   });
   res.json({ user });
 });

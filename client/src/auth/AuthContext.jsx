@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api, tokenStore } from '../api.js';
+import { getLocalTimeZone } from '../lib/tz.js';
 
 const AuthContext = createContext(null);
 
@@ -19,6 +20,18 @@ export function AuthProvider({ children }) {
       .catch(() => tokenStore.clear())
       .finally(() => setLoading(false));
   }, []);
+
+  // Keep the user's stored timezone in sync with the browser's, automatically —
+  // so their marks are saved in the right zone with zero configuration. Runs
+  // once the user is known and again only if the detected zone actually differs.
+  useEffect(() => {
+    if (!user) return;
+    const tz = getLocalTimeZone();
+    if (user.timezone === tz) return;
+    api('/profile', { method: 'PATCH', body: { timezone: tz } })
+      .then((data) => setUser(data.user))
+      .catch(() => {}); // best-effort; a failed sync just retries next load
+  }, [user]);
 
   const login = useCallback(async (username, password) => {
     const data = await api('/auth/login', { method: 'POST', body: { username, password } });
