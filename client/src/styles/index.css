@@ -103,7 +103,13 @@ button { font: inherit; cursor: pointer; }
   backdrop-filter: blur(8px);
 }
 .card__title { font-weight: 600; margin-bottom: 12px; }
-.card--grid { padding: 14px; overflow-x: auto; }
+/* No overflow/blur here: an overflow container (or a backdrop-filter ancestor)
+   would trap the grid's sticky day-header so it couldn't pin to the window. */
+.card--grid { padding: 14px; overflow: visible; backdrop-filter: none; }
+/* The admin editor is nested inside a clipped row (.user-row-wrap { overflow:
+   hidden }), so its grid can't pin to the window — keep its own sideways scroll
+   so a wide week isn't cut off on narrow screens. */
+.edit-panel .card--grid { overflow-x: auto; }
 /* Card header row: title on the left, a control (e.g. a mode toggle) in the corner. */
 .card__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .card__head .card__title { margin-bottom: 0; }
@@ -216,14 +222,33 @@ input[type='time'] { width: auto; }
   -webkit-user-select: none;
   -webkit-touch-callout: none; /* no iOS text bubble on press-and-hold */
   -webkit-tap-highlight-color: transparent; /* no grey flash when tapping a cell */
-  min-width: max-content;
 }
 .grid.is-painting, .grid.is-resizing { touch-action: none; } /* paint / edge-drag: don't scroll */
-.grid__corner { position: sticky; left: 0; }
+/* The day-of-week row stays in view while the tall hour grid scrolls past, so
+   you always see which day you're marking. It pins just under the topbar
+   (--topbar-h, measured in Layout). The frosted backdrop is a SINGLE bar
+   (.grid__headbar) spanning the day columns — one backdrop-filter so the blur is
+   continuous across the full width instead of being clipped to each day cell.
+   The corner over the time column is left blank. */
+.grid__corner, .grid__dayhead, .grid__headbar {
+  position: sticky;
+  top: var(--topbar-h, 60px);
+}
+.grid__headbar {
+  z-index: 5;
+  /* --bg-soft tone (not the darker --bg) so the bar reads as part of the card,
+     frosted enough to mask the hour grid scrolling under it. */
+  background: rgba(18, 18, 31, 0.78);
+  backdrop-filter: blur(14px) saturate(1.25);
+  border-bottom: 1px solid var(--border);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.grid__corner { left: 0; z-index: 4; } /* blank cell over the time column */
 .grid__dayhead {
+  z-index: 6; /* labels sit on top of the frosted bar */
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   padding: 6px 4px; border: none; background: transparent; color: var(--muted);
-  border-bottom: 1px solid var(--border);
 }
 .grid__dayhead.is-today { color: var(--text); }
 .grid__dayhead.is-today .grid__date { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 700; }
@@ -446,6 +471,8 @@ input[type='time'] { width: auto; }
   .nav { order: 3; flex-basis: 100%; margin-right: 0; gap: 6px; }
   .nav__link { flex: 1; text-align: center; padding: 9px 6px; font-size: 0.9rem; }
 
-  /* Roomier rows for thumb taps; fit the week without sideways scrolling. */
-  .grid { grid-template-columns: 46px repeat(var(--cols), minmax(40px, 1fr)); --row-h: 30px; }
+  /* Roomier rows for thumb taps; trim padding + columns so the week fits the
+     viewport width (the grid card no longer scrolls sideways to absorb it). */
+  .card--grid { padding: 8px; }
+  .grid { grid-template-columns: 46px repeat(var(--cols), minmax(38px, 1fr)); --row-h: 30px; }
 }

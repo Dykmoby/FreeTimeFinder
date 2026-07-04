@@ -473,6 +473,7 @@ export default function SlotGrid({
       onMouseLeave={editable ? () => setHoverId(null) : undefined}
     >
       <div className="grid__corner" style={{ gridRow: 1, gridColumn: 1 }} />
+      <div className="grid__headbar" style={{ gridRow: 1, gridColumn: '2 / -1' }} />
       {days.map((d, di) => (
         <button
           key={toISODate(d)}

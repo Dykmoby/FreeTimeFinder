@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import Avatar from './Avatar.jsx';
@@ -10,6 +11,21 @@ const links = [
 export default function Layout({ children }) {
   const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+  const headerRef = useRef(null);
+
+  // Publish the topbar's real height so the calendar can pin its day-of-week
+  // header just below it on scroll. The bar is taller on mobile (two rows),
+  // so measure it rather than hard-coding.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const setH = () =>
+      document.documentElement.style.setProperty('--topbar-h', `${el.offsetHeight}px`);
+    setH();
+    const ro = new ResizeObserver(setH);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   function handleLogout() {
     logout();
@@ -18,7 +34,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-shell">
-      <header className="topbar">
+      <header className="topbar" ref={headerRef}>
         <div className="topbar__inner">
           <NavLink to="/" className="brand">
             <span className="brand__dot" />

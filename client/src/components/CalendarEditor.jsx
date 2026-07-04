@@ -230,7 +230,6 @@ export default function CalendarEditor({
 
       {view === 'week' && (
         <div className="card card--grid">
-          <p className="hint">На компьютере тяните по сетке, на телефоне касайтесь ячеек — свайп листает, не отмечая. Наведитесь на интервал, чтобы выбрать, кому он виден.</p>
           <SlotGrid
             days={range.days}
             availabilityByDay={byDay}
