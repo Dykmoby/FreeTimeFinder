@@ -24,7 +24,8 @@ export const config = {
 
   paths: {
     serverRoot,
-    dbFile: path.join(serverRoot, 'data', 'app.db'),
+    // DB_FILE override lets tooling run an isolated instance on a scratch DB.
+    dbFile: process.env.DB_FILE || path.join(serverRoot, 'data', 'app.db'),
     schemaFile: path.join(serverRoot, 'src', 'db', 'schema.sql'),
     uploadsDir: path.join(serverRoot, 'uploads'),
     // Built client (created by `npm run build`); served in production.

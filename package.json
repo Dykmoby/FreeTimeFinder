@@ -11,6 +11,7 @@
     "deploy": "bash scripts/deploy.sh"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "puppeteer-core": "^25.3.0"
   }
 }

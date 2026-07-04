@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import Avatar from '../components/Avatar.jsx';

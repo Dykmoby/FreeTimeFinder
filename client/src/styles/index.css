@@ -241,8 +241,15 @@ input[type='time'] { width: auto; }
   background: rgba(18, 18, 31, 0.78);
   backdrop-filter: blur(14px) saturate(1.25);
   border-bottom: 1px solid var(--border);
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
+  border-radius: 12px 12px 0 0;
+  transition: border-radius 0.25s ease;
+}
+/* Pinned below the topbar (GridHeadbar toggles this): the bar now hangs over
+   the scrolling hour grid instead of capping the card, so the rounding flips
+   to its bottom edge. */
+.grid__headbar.is-stuck { border-radius: 0 0 12px 12px; }
+@media (prefers-reduced-motion: reduce) {
+  .grid__headbar { transition: none; }
 }
 .grid__corner { left: 0; z-index: 4; } /* blank cell over the time column */
 .grid__dayhead {

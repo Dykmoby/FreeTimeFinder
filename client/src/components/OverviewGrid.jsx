@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { gridSlots, minToLabel, toISODate, weekdayShort, isToday } from '../lib/time.js';
+import GridHeadbar from './GridHeadbar.jsx';
 
 /**
  * Read-only time grid for the shared view.
@@ -12,7 +13,7 @@ export default function OverviewGrid({ days, getCell }) {
   return (
     <div className="grid grid--readonly" style={{ '--cols': days.length, '--rows': slots.length }}>
       <div className="grid__corner" style={{ gridRow: 1, gridColumn: 1 }} />
-      <div className="grid__headbar" style={{ gridRow: 1, gridColumn: '2 / -1' }} />
+      <GridHeadbar />
       {days.map((d, di) => (
         <div
           key={toISODate(d)}

@@ -12,6 +12,7 @@ import {
 } from '../lib/time.js';
 import { intervalsToSlotSet } from '../lib/intervals.js';
 import Avatar from './Avatar.jsx';
+import GridHeadbar from './GridHeadbar.jsx';
 
 function buildSelected(isoList, byDay, slots) {
   const set = new Set();
@@ -473,7 +474,7 @@ export default function SlotGrid({
       onMouseLeave={editable ? () => setHoverId(null) : undefined}
     >
       <div className="grid__corner" style={{ gridRow: 1, gridColumn: 1 }} />
-      <div className="grid__headbar" style={{ gridRow: 1, gridColumn: '2 / -1' }} />
+      <GridHeadbar />
       {days.map((d, di) => (
         <button
           key={toISODate(d)}
