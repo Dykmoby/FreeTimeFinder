@@ -234,6 +234,13 @@ input[type='time'] { width: auto; }
   position: sticky;
   top: var(--topbar-h, 60px);
 }
+/* The admin editor's card is itself a (sideways) scroll container, so these
+   would stick to the card, not the window — shoved --topbar-h down over the
+   first grid rows. The header can't pin inside the clipped row anyway, so let
+   it flow normally there. */
+.edit-panel .card--grid :is(.grid__corner, .grid__dayhead, .grid__headbar) {
+  position: static;
+}
 .grid__headbar {
   z-index: 5;
   /* --bg-soft tone (not the darker --bg) so the bar reads as part of the card,

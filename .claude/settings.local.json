@@ -17,5 +17,6 @@
       "Bash(bash /home/dykmoby/free-time-finder/scripts/deploy.sh)",
       "Bash(grep -vE 'deprecated|funding|packages are looking|audited|found 0 vuln|up to date|^\\\\s*$|^> |run `npm')"
     ]
-  }
+  },
+  "outputStyle": "Concise"
 }
